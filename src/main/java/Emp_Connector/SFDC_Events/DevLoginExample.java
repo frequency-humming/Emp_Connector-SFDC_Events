@@ -1,12 +1,10 @@
 package Emp_Connector.SFDC_Events;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
-import org.eclipse.jetty.util.ajax.JSON;
 
 import static org.cometd.bayeux.Channel.*;
 
@@ -53,7 +51,7 @@ public class DevLoginExample {
 		try {
 			DatabaseService service = new DatabaseService();
 	        Consumer<Map<String, Object>> consumer = event -> workerThreadPool.submit(() -> 
-	        System.out.println(String.format("Received:\n%s", JSON.toString(event),Thread.currentThread().getName(), Thread.currentThread().getId())));
+	        System.out.println(String.format("Received:\n%s",Thread.currentThread().getName(), Thread.currentThread().getId())));
 
 	        consumer=event->event.forEach((k,v) -> service.dataProcess(k,v));
 	        TopicSubscription subscription = connector.subscribe(lc.get(3), replayFrom, consumer).get(5, TimeUnit.SECONDS);
