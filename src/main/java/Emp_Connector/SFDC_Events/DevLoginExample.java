@@ -51,9 +51,11 @@ public class DevLoginExample {
 		}
 
 		try {
-	        Consumer<Map<String, Object>> consumer = event -> workerThreadPool.submit(() -> System.out.println(String.format("Received:\n%s", JSON.toString(event))));
+			DatabaseService service = new DatabaseService();
+	        Consumer<Map<String, Object>> consumer = event -> workerThreadPool.submit(() -> 
+	        System.out.println(String.format("Received:\n%s", JSON.toString(event),Thread.currentThread().getName(), Thread.currentThread().getId())));
 
-	        consumer=event->event.forEach((k,v) -> lamb(k,v));
+	        consumer=event->event.forEach((k,v) -> service.dataProcess(k,v));
 	        TopicSubscription subscription = connector.subscribe(lc.get(3), replayFrom, consumer).get(5, TimeUnit.SECONDS);
 
 		} catch (ExecutionException e) {
@@ -67,14 +69,4 @@ public class DevLoginExample {
 		}
 	}
 
-	public static void lamb(String key,Object val) {
-		
-		HashMap<String,String> mop = new HashMap<String,String>();
-		
-		if(key.contains("payload")) {
-			((HashMap<String,String>) val).forEach((k,v)->mop.put(k,v));
-			mop.forEach((k,v) -> System.out.println("key : "+k+" value : "+v));
-		}
-		
-	}
 }

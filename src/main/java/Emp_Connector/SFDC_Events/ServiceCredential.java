@@ -25,7 +25,7 @@ public class ServiceCredential {
 	public static List<String> loginProperties() {
 		List<String> lc = new ArrayList<>();
 		try {
-			String preProp = decrypt();
+			String preProp = decrypt(false);
 			StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
 			encryptor.setPassword(preProp);
 			encryptor.setAlgorithm("PBEWithHMACSHA512AndAES_256");
@@ -42,21 +42,46 @@ public class ServiceCredential {
 		return lc;
 	}
 	
-	public static String decrypt() {
+	public static String decrypt(boolean db) {
 		
 		String prop = null;
 		try {
 			PropertiesConfiguration config = new PropertiesConfiguration();
 			config.load("resources/application.properties");
-			String key = config.getString("salesforce.secret");
-			String env = config.getString("salesforce.env.key");
-			AES256TextEncryptor textEncryptor = new AES256TextEncryptor();
-			textEncryptor.setPassword(key);
-			prop = textEncryptor.decrypt(env);
+			if(db) {
+				String key = config.getString("db.postgres.key");
+				return key;
+			} else {
+				String key = config.getString("salesforce.secret");
+				String env = config.getString("salesforce.env.key");
+				AES256TextEncryptor textEncryptor = new AES256TextEncryptor();
+				textEncryptor.setPassword(key);
+				prop = textEncryptor.decrypt(env);
+			}
+			
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 		}
 		return prop;
+	}
+	
+	public static List<String> dbConnection() {
+		List<String> dblc = new ArrayList<>();
+		try {
+			String dbkey = decrypt(true);
+			StandardPBEStringEncryptor encryptor = new StandardPBEStringEncryptor();
+			encryptor.setPassword(dbkey);
+			encryptor.setAlgorithm("PBEWithHMACSHA512AndAES_256");
+			encryptor.setIvGenerator(new RandomIvGenerator());
+			Properties props = new EncryptableProperties(encryptor);
+			props.load(new FileInputStream("resources/application.properties"));
+			String dbUsername = props.getProperty("db.postgres.username");
+			String dbPasword = props.getProperty("db.postgres.password");
+			Collections.addAll(dblc,dbUsername,dbPasword);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}  
+        return dblc;
 	}
 
 }
