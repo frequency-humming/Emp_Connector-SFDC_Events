@@ -49,7 +49,7 @@ public class DatabaseService {
 		Map<String, String> settings = new HashMap<>();
 		settings.put("connection.driver_class", "org.postgresql.Driver");
 		settings.put("dialect", "org.hibernate.dialect.PostgreSQLDialect");
-		settings.put("hibernate.connection.url", "jdbc:postgresql://localhost:5432/Mid_Journey");
+		settings.put("hibernate.connection.url",dbproperties.get(2));
 		settings.put("hibernate.connection.username",dbproperties.get(0));
 		settings.put("hibernate.connection.password", dbproperties.get(1));
 		settings.put("hibernate.current_session_context_class", "thread");
