@@ -1,6 +1,5 @@
 package Emp_Connector.SFDC_Events;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +8,7 @@ import java.util.Properties;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.log4j.chainsaw.Main;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.jasypt.iv.RandomIvGenerator;
 import org.jasypt.properties.EncryptableProperties;
@@ -21,6 +21,7 @@ public class ServiceCredential {
 	static String Password;
 	static String Event = "/event/User_Event__e";
 	static String Replay = "-1";
+	static String database;
 	
 	public static List<String> loginProperties() {
 		List<String> lc = new ArrayList<>();
@@ -31,7 +32,7 @@ public class ServiceCredential {
 			encryptor.setAlgorithm("PBEWithHMACSHA512AndAES_256");
 			encryptor.setIvGenerator(new RandomIvGenerator());
 			Properties props = new EncryptableProperties(encryptor);
-			props.load(new FileInputStream("resources/application.properties"));
+			props.load(Main.class.getClassLoader().getResourceAsStream("application.properties"));
 			Url = props.getProperty("salesforce.url");
 			Username = props.getProperty("salesforce.username");
 			Password = props.getProperty("salesforce.password");
@@ -47,8 +48,9 @@ public class ServiceCredential {
 		String prop = null;
 		try {
 			PropertiesConfiguration config = new PropertiesConfiguration();
-			config.load("resources/application.properties");
+			config.load(Main.class.getClassLoader().getResourceAsStream("application.properties"));
 			if(db) {
+				database = config.getString("db.postgres.database");
 				String key = config.getString("db.postgres.key");
 				return key;
 			} else {
@@ -74,14 +76,13 @@ public class ServiceCredential {
 			encryptor.setAlgorithm("PBEWithHMACSHA512AndAES_256");
 			encryptor.setIvGenerator(new RandomIvGenerator());
 			Properties props = new EncryptableProperties(encryptor);
-			props.load(new FileInputStream("resources/application.properties"));
+			props.load(Main.class.getClassLoader().getResourceAsStream("application.properties"));
 			String dbUsername = props.getProperty("db.postgres.username");
 			String dbPasword = props.getProperty("db.postgres.password");
-			Collections.addAll(dblc,dbUsername,dbPasword);
+			Collections.addAll(dblc,dbUsername,dbPasword,database);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}  
         return dblc;
 	}
-
 }
