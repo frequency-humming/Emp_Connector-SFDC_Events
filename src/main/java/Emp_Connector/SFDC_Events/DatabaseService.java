@@ -38,7 +38,8 @@ public class DatabaseService {
 			GuestUser user = new GuestUser(map.get("App__c"),map.get("UserIP__c"),map.get("Image_Type__c"),map.get("LoginType__c"),map.get("CreatedById"));
 			session.persist(user);
 			session.getTransaction().commit();
-			session.close();
+			//session.close();
+			session.disconnect();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
@@ -48,10 +49,10 @@ public class DatabaseService {
 		List<String> dbproperties = ServiceCredential.dbConnection();
 		Map<String, String> settings = new HashMap<>();
 		settings.put("connection.driver_class", "org.postgresql.Driver");
-		settings.put("dialect", "org.hibernate.dialect.PostgreSQLDialect");
+		settings.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
 		settings.put("hibernate.connection.url",dbproperties.get(2));
 		settings.put("hibernate.connection.username",dbproperties.get(0));
-		settings.put("hibernate.connection.password", dbproperties.get(1));
+		settings.put("hibernate.connection.password",dbproperties.get(1));
 		settings.put("hibernate.current_session_context_class", "thread");
 		settings.put("hibernate.show_sql", "true");
 		settings.put("hibernate.format_sql", "true");
@@ -68,5 +69,4 @@ public class DatabaseService {
 		return session;
 		
 		}
-
 }
