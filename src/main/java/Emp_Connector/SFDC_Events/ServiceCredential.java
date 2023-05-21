@@ -50,7 +50,10 @@ public class ServiceCredential {
 			PropertiesConfiguration config = new PropertiesConfiguration();
 			config.load(Main.class.getClassLoader().getResourceAsStream("application.properties"));
 			if(db) {
-				database = config.getString("db.postgres.database");
+				String connection = config.getString("db.postgres.connection");
+				String port = config.getString("db.postgres.port");
+				String table = config.getString("db.postgres.database");
+				database = connection+System.getenv("HOSTNAME")+port+table;
 				String key = config.getString("db.postgres.key");
 				return key;
 			} else {
