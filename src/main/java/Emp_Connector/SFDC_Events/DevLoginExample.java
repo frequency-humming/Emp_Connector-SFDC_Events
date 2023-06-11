@@ -11,7 +11,7 @@ import static org.cometd.bayeux.Channel.*;
 
 public class DevLoginExample {
 
-	private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(1);
+	private final ExecutorService workerThreadPool = Executors.newFixedThreadPool(2);
 	List<String> lc;
 
 	public static void main(String[] argv) throws Throwable {
@@ -50,11 +50,11 @@ public class DevLoginExample {
 
 		try {
 			DatabaseService service = new DatabaseService();
-	        Consumer<Map<String, Object>> consumer = event -> workerThreadPool.submit(() -> 
-	        System.out.println(String.format("Received:\n%s",Thread.currentThread().getName(), Thread.currentThread().getId())));
-
-	        consumer=event->event.forEach((k,v) -> service.dataProcess(k,v));
-	        TopicSubscription subscription = connector.subscribe(lc.get(3), replayFrom, consumer).get(5, TimeUnit.SECONDS);
+			Consumer<Map<String, Object>> consumer = event -> workerThreadPool.submit(() -> {
+		        System.out.println(String.format("Received in consumer1:\nThread Name: %s\nThread ID: %d", Thread.currentThread().getName(), Thread.currentThread().getId()));
+		        event.forEach((k,v) -> service.dataProcess(k,v));
+		    });
+	        TopicSubscription subscription = connector.subscribe(lc.get(3),replayFrom, consumer).get(5, TimeUnit.SECONDS);
 
 		} catch (ExecutionException e) {
 			System.err.println(e.getCause().toString());
