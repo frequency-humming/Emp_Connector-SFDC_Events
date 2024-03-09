@@ -1,4 +1,4 @@
-FROM amazoncorretto:11
+FROM --platform=linux/amd64 amazoncorretto:11
 
 RUN yum install -y curl
 
